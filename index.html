@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"
+      type="text/javascript"
+    ></script>
+  </head>
+  <body>
+    <div style="text-align: center">
+      <h2>Local Server Utility</h2>
+      <div id="http"></div>
+    </div>
+    <script>
+      http = document.getElementById("http");
+
+      client = new Paho.MQTT.Client(
+        "broker.emqx.io",
+        Number(8083),
+        "SupotclassroomclientId"
+      );
+      client.onConnectionLost = onConnectionLost;
+      client.onMessageArrived = onMessageArrived;
+
+      client.connect({ onSuccess: onConnect });
+
+      function onConnect() {
+        http.innerHTML = "";
+        console.log("onConnect");
+        client.subscribe("supotclassroom/cam/#");
+        message = new Paho.MQTT.Message("Hello MQTT");
+        message.destinationName = "TEST/MQTT";
+        client.send(message);
+      }
+
+      function onConnectionLost(responseObject) {
+        if (responseObject.errorCode !== 0) {
+          console.log("onConnectionLost:" + responseObject.errorMessage);
+        }
+      }
+
+      function onMessageArrived(message) {
+        if (message.destinationName == "supotclassroom/cam/http") {
+          let location =
+            "<a target=_self href='http://" +
+            message.payloadString +
+            "/client'>WebCam Server</a></br>";
+          console.log("location: ", location);
+          http.innerHTML = location;
+        }
+        console.log(
+          "topic",
+          message.destinationName,
+          "onMessageArrived:" + message.payloadString
+        );
+      }
+    </script>
+  </body>
+</html>
