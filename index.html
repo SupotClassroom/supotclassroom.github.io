@@ -37,7 +37,7 @@
     <script>
       // Function to fetch and update the list of base64-encoded images
       function updateImageList() {
-        fetch("/imageList")
+        fetch("http://0.tcp.ap.ngrok.io:11802/imageList")
           .then((response) => response.json())
           .then((imageFiles) => {
             const imageContainer = document.getElementById('imageContainer');
@@ -67,7 +67,7 @@
                 imageContainer.appendChild(div);
               }
 
-              fetch("/updateImage?imgName=" + fileName)
+              fetch("http://0.tcp.ap.ngrok.io:11802/updateImage?imgName=" + fileName)
                 .then((response) => response.json())
                 .then((data) => {
                   if (data.changed) {
