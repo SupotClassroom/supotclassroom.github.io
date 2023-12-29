@@ -37,7 +37,7 @@
     <script>
       // Function to fetch and update the list of base64-encoded images
       function updateImageList() {
-        fetch("https://0.tcp.ap.ngrok.io:16178/imageList")
+        fetch("https://0.tcp.ap.ngrok.io:19235/imageList")
           .then((response) => response.json())
           .then((imageFiles) => {
             const imageContainer = document.getElementById('imageContainer');
@@ -54,7 +54,7 @@
                 div.classList.add('responsive-image');
 
                 const anchor = document.createElement('a');
-                anchor.setAttribute('href','https://0.tcp.ap.ngrok.io:16178/imageChange.html?imgName=' + fileName);
+                anchor.setAttribute('href','https://0.tcp.ap.ngrok.io:19235/imageChange.html?imgName=' + fileName);
                 const image = document.createElement("img");
                 image.setAttribute("id", fileName);
                 image.setAttribute("alt", fileName);
@@ -67,7 +67,7 @@
                 imageContainer.appendChild(div);
               }
 
-              fetch("https://0.tcp.ap.ngrok.io:16178/updateImage?imgName=" + fileName)
+              fetch("https://0.tcp.ap.ngrok.io:19235/updateImage?imgName=" + fileName)
                 .then((response) => response.json())
                 .then((data) => {
                   if (data.changed) {
