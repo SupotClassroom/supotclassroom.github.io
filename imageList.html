@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image List</title>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .image-container {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+      }
+
+      .responsive-image {
+          flex: 1 0 300px; /* Adjust the width as needed */
+          margin: 10px; /* Adjust the margin as needed */
+          max-width: 50%;
+          overflow: hidden;
+      }
+
+      .responsive-image img {
+          width: 100%;
+          height: auto;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    
+    <div class='image-container' id='imageContainer'></div>
+
+    <script>
+      // Function to fetch and update the list of base64-encoded images
+      function updateImageList() {
+        fetch("/imageList")
+          .then((response) => response.json())
+          .then((imageFiles) => {
+            const imageContainer = document.getElementById('imageContainer');
+
+            // Iterate through the list of image files and create table rows
+            imageFiles.forEach((imageFile) => {
+              // Create an image element
+              let fileName = imageFile.replace(".jpg", "");
+              var image = document.getElementById(fileName);
+
+              //console.log("image", image, "fileName", fileName);
+              if (image == null) {
+                const div = document.createElement('div');
+                div.classList.add('responsive-image');
+
+                const anchor = document.createElement('a');
+                anchor.setAttribute('href','/imageChange.html?imgName=' + fileName);
+                const image = document.createElement("img");
+                image.setAttribute("id", fileName);
+                image.setAttribute("alt", fileName);
+                const title = document.createElement('h2');
+                title.innerText = fileName;
+
+                div.appendChild(title);
+                div.appendChild(anchor);
+                anchor.appendChild(image);
+                imageContainer.appendChild(div);
+              }
+
+              fetch("/updateImage?imgName=" + fileName)
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.changed) {
+                    // If the server responds with base64 data, update the image
+                    if (data.base64Data && image !== null)
+                      image.src = `data:image/jpeg;base64,${data.base64Data}`;
+                  }
+                })
+                .catch((error) =>
+                  console.error("Error checking for changes:", error)
+                );
+
+              // Set any additional attributes or styles as needed
+              //image.alt = imageFile;
+
+            });
+          })
+          .catch((error) => console.error("Error fetching image list:", error));
+      }
+
+      // Initial image list update
+      updateImageList();
+
+      // Periodically update the image list every 5 seconds (adjust as needed)
+      setInterval(updateImageList, 250);
+    </script>
+  </body>
+</html>

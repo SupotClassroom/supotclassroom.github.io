@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Image</title>
+  <style>
+    body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+    }
+
+    .container {
+        text-align: center;
+    }
+
+    .centered-image {
+        height: 100vh;
+        max-width: 100%; /* Ensure the image doesn't exceed its container's width */
+        max-height: 100%; /* Ensure the image doesn't exceed its container's height */
+        display: block; /* Remove any default inline styles */
+        margin: auto; /* Center the image horizontally */
+    }
+    .material-icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        background-color: #2196F3; /* Material Design primary color */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 24px;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+    <button class="material-icon-button" onclick="history.back()">
+      <i class="material-icons">assignment_return</i> <!-- Replace 'favorite' with the desired icon name -->
+    </button>  
+    <img class="centered-image" id="dynamicImage" src="" alt="Image">
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let imgName = urlParams.get("imgName");
+
+    function updateImage(base64Data) {
+      var image = document.getElementById('dynamicImage');
+      image.src = "data:image/jpeg;base64," + base64Data; // Assuming it's a JPEG, adjust accordingly
+    }
+
+    function checkForChanges() {
+      fetch('/updateImage?imgName=' + imgName)
+        .then(response => response.json())
+        .then(data => {
+          if (data.changed) {
+            // If the server responds with base64 data, update the image
+            if(data.base64Data)
+              updateImage(data.base64Data);
+          }
+        })
+        .catch(error => console.error('Error checking for changes:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Initial image update
+      checkForChanges();
+
+      // Periodically check for changes (adjust the interval as needed)
+      setInterval(checkForChanges, 50); // Check every 5 seconds
+    });
+  </script>
+</body>
+
+</html>
